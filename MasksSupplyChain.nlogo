@@ -27,7 +27,6 @@ to setup
   clear-all
   reset-ticks
   set workerCap 10
-  set workers numOfWorkers
   set inv_producer 0
   set inv_inter_receive 0
   set inv_inter_send 0
@@ -45,16 +44,21 @@ end
 
 ;;process start
 to process
+  workers-count
   send-request
   send-delivery
   getPlot
 end
 
+to workers-count
+  set workers (numOfWorkers * (100 - infectedRate) / 100)
+end
+
 to getPlot
-  set masksDelRate (( inv_consumer / weeklyMasksRequirement) * 100)
   set totMasksCreated (totMasksCreated + inv_consumer)
   set actMasksNeeded (actMasksNeeded + weeklyMasksRequirement)
   set masksLess (actMasksNeeded - totMasksCreated)
+  set masksDelRate (( totMasksCreated / actMasksNeeded) * 100)
   set inv_consumer 0
 end
 
@@ -103,9 +107,9 @@ end
 to interToCons
   let curWeekDel (workers * workerCap)
 
-  if inv_inter_receive >= weeklyMasksRequirement[
+  if inv_inter_receive >= curWeekDel[
     set inv_inter_send (inv_inter_send + weeklyMasksRequirement)
-    if inv_inter_send >= weeklyMasksRequirement [
+    if inv_inter_send >= curWeekDel [
       set inv_consumer (inv_consumer + weeklyMasksRequirement)
 
       set inv_inter_send (inv_inter_send - weeklyMasksRequirement)
@@ -170,7 +174,6 @@ to create-lnks
 end
 
 ;; consmetic end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 375
@@ -278,7 +281,7 @@ infectedRate
 infectedRate
 0
 100
-0.0
+50.0
 1
 1
 NIL
@@ -293,7 +296,7 @@ weeklyMasksRequirement
 weeklyMasksRequirement
 0
 2000
-400.0
+500.0
 50
 1
 NIL
@@ -311,92 +314,52 @@ masksDelRate
 11
 
 MONITOR
-11
-225
-88
-270
-NIL
-reqs_inter
-17
-1
-11
-
-MONITOR
-108
-225
-186
-270
-NIL
-reqs_prod
-17
-1
-11
-
-MONITOR
-204
-225
-305
-270
-NIL
-inv_consumer
-17
-1
-11
-
-MONITOR
-12
-299
-108
-344
-NIL
-inv_producer
-17
-1
-11
-
-MONITOR
-136
-298
-240
-343
-NIL
-inv_inter_send
-17
-1
-11
-
-MONITOR
-24
-372
-142
-417
-NIL
-inv_inter_receive
-17
-1
-11
-
-MONITOR
-176
-384
-293
-429
+22
+331
+139
+376
 NIL
 totMasksCreated
 17
 1
 11
 
-INPUTBOX
-212
-57
-361
-117
+SLIDER
+34
+230
+206
+263
 numOfWorkers
-10.0
-1
+numOfWorkers
 0
-Number
+500
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+34
+279
+150
+324
+NIL
+actMasksNeeded
+17
+1
+11
+
+MONITOR
+38
+408
+118
+453
+NIL
+masksLess
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
