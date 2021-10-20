@@ -13,6 +13,7 @@ globals[
   totMasksCreated
   actMasksNeeded
   masksLess
+  consumerQuant
 
   workers
 ]
@@ -32,26 +33,32 @@ to setup
   set inv_inter_send 0
   set inv_consumer 0
   set actMasksNeeded 0
+  set consumerQuant 0
   create-houses
   create-lnks
 end
 
 to go
-  if(ticks >= 500) [stop]
+  if(ticks >= 52) [stop]
   process
   tick
 end
 
 ;;process start
 to process
-  workers-count
+  set-workers
   send-request
   send-delivery
   getPlot
 end
 
-to workers-count
-  set workers (numOfWorkers * (100 - infectedRate) / 100)
+to set-workers
+  if ticks < 8 or ticks > 10 [
+    set workers numOfWorkers
+  ]
+  if ticks >= 8 and ticks <= 10[
+    set workers (numOfWorkers * (100 - infectedRate) / 100)
+  ]
 end
 
 to getPlot
@@ -59,6 +66,9 @@ to getPlot
   set actMasksNeeded (actMasksNeeded + weeklyMasksRequirement)
   set masksLess (actMasksNeeded - totMasksCreated)
   set masksDelRate (( totMasksCreated / actMasksNeeded) * 100)
+
+  ifelse inv_consumer = 0 [set consumerQuant (consumerQuant - weeklyMasksRequirement)] [set consumerQuant (consumerQuant + weeklyMasksRequirement)]
+
   set inv_consumer 0
 end
 
@@ -105,18 +115,16 @@ to prodsToInter
 end
 
 to interToCons
-  let curWeekDel (workers * workerCap)
-
-  if inv_inter_receive >= curWeekDel[
+  if inv_inter_receive >= weeklyMasksRequirement[
     set inv_inter_send (inv_inter_send + weeklyMasksRequirement)
-    if inv_inter_send >= curWeekDel [
+    set inv_inter_receive (inv_inter_receive - weeklyMasksRequirement)
+    if inv_inter_send >= weeklyMasksRequirement[
       set inv_consumer (inv_consumer + weeklyMasksRequirement)
 
       set inv_inter_send (inv_inter_send - weeklyMasksRequirement)
 
       set reqs_inter (reqs_inter - weeklyMasksRequirement)
     ]
-    set inv_inter_receive (inv_inter_receive - weeklyMasksRequirement)
   ]
 end
 ;;del process end
@@ -245,7 +253,7 @@ plot 1
 weeks
 count
 0.0
-100.0
+52.0
 0.0
 100.0
 true
@@ -254,6 +262,8 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" "plot totMasksCreated"
 "pen-1" 1.0 0 -2674135 true "" "plot masksLess"
+"pen-2" 1.0 0 -13791810 true "" "plot consumerQuant"
+"pen-3" 1.0 0 -12087248 true "" "plot actMasksNeeded"
 
 BUTTON
 126
@@ -281,7 +291,7 @@ infectedRate
 infectedRate
 0
 100
-50.0
+69.0
 1
 1
 NIL
