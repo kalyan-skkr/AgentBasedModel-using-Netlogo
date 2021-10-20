@@ -13,7 +13,6 @@ globals[
   totMasksCreated
   actMasksNeeded
   masksLess
-  consumerQuant
 
   workers
 ]
@@ -33,7 +32,6 @@ to setup
   set inv_inter_send 0
   set inv_consumer 0
   set actMasksNeeded 0
-  set consumerQuant 0
   create-houses
   create-lnks
 end
@@ -50,6 +48,11 @@ to process
   send-request
   send-delivery
   getPlot
+  if infectedRate > 0
+  [
+    if ticks > 10 [
+      set infectedRate infectedRate - 1 ]
+  ]
 end
 
 to set-workers
@@ -66,9 +69,6 @@ to getPlot
   set actMasksNeeded (actMasksNeeded + weeklyMasksRequirement)
   set masksLess (actMasksNeeded - totMasksCreated)
   set masksDelRate (( totMasksCreated / actMasksNeeded) * 100)
-
-  ifelse inv_consumer = 0 [set consumerQuant (consumerQuant - weeklyMasksRequirement)] [set consumerQuant (consumerQuant + weeklyMasksRequirement)]
-
   set inv_consumer 0
 end
 
@@ -184,9 +184,9 @@ end
 ;; consmetic end
 @#$#@#$#@
 GRAPHICS-WINDOW
-375
+290
 10
-812
+727
 448
 -1
 -1
@@ -211,10 +211,10 @@ ticks
 30.0
 
 BUTTON
-41
-64
-107
-97
+91
+373
+194
+406
 NIL
 setup
 NIL
@@ -228,10 +228,10 @@ NIL
 1
 
 BUTTON
-89
-10
-152
-43
+58
+422
+121
+455
 NIL
 go
 T
@@ -245,10 +245,10 @@ NIL
 1
 
 PLOT
-827
-12
-1112
-283
+806
+19
+1047
+231
 plot 1
 weeks
 count
@@ -262,14 +262,12 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" "plot totMasksCreated"
 "pen-1" 1.0 0 -2674135 true "" "plot masksLess"
-"pen-2" 1.0 0 -13791810 true "" "plot consumerQuant"
-"pen-3" 1.0 0 -12087248 true "" "plot actMasksNeeded"
 
 BUTTON
-126
-65
-189
-98
+164
+422
+227
+455
 NIL
 go
 NIL
@@ -283,25 +281,25 @@ NIL
 1
 
 SLIDER
-27
-123
-199
-156
+25
+67
+265
+100
 infectedRate
 infectedRate
 0
 100
-69.0
+38.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-24
-170
-234
-203
+26
+118
+266
+151
 weeklyMasksRequirement
 weeklyMasksRequirement
 0
@@ -313,21 +311,21 @@ NIL
 HORIZONTAL
 
 MONITOR
-877
-327
-975
-372
-NIL
+160
+311
+276
+356
+Percent of Masks Delivered
 masksDelRate
 17
 1
 11
 
 MONITOR
-22
-331
-139
-376
+160
+234
+277
+279
 NIL
 totMasksCreated
 17
@@ -335,10 +333,10 @@ totMasksCreated
 11
 
 SLIDER
-34
-230
-206
-263
+28
+169
+266
+202
 numOfWorkers
 numOfWorkers
 0
@@ -350,10 +348,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-34
+12
+234
+128
 279
-150
-324
 NIL
 actMasksNeeded
 17
@@ -361,15 +359,34 @@ actMasksNeeded
 11
 
 MONITOR
-38
-408
-118
-453
-NIL
+12
+310
+127
+355
+Missing Masks
 masksLess
 17
 1
 11
+
+PLOT
+807
+259
+1091
+454
+plot 2
+Mask Ordered
+Mask Delivered
+0.0
+100000.0
+0.0
+100000.0
+true
+false
+"" ""
+PENS
+"default" 10000.0 1 -16777216 true "" "plot actMasksNeeded"
+"pen-1" 10000.0 0 -7500403 true "" "plot totMasksCreated"
 
 @#$#@#$#@
 ## WHAT IS IT?
